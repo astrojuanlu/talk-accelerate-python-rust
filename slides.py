@@ -52,7 +52,7 @@ def _(mo):
         - Contributor to the SciPy and PyData ecosystem 🧪
         - Music lover 🎵
 
-        Follow me! 🧑‍💻 [github.com/astrojuanlu](https://github.com/astrojuanlu)
+        Follow me! ::octicon:mark-github-16:: [github.com/astrojuanlu](https://github.com/astrojuanlu)
 
         ![Mini Juanlu](public/minijuanlu.png)
         """
@@ -215,6 +215,81 @@ def _(mo):
         cache-keys = [{file = "pyproject.toml"}, {file = "rust/Cargo.toml"}, {file = "**/*.rs"}]
         # Uncomment to build rust code in development mode
         # config-settings = { build-args = '--profile=dev' }
+        ```
+        """
+    )
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md(
+        r"""
+        ## How does this all work?
+
+        This makes use of [PyO3](https://pyo3.rs/), a project that provides "Rust bindings to the Python interpreter".
+
+        > PyO3 can be used to write native Python modules or run Python code and modules from Rust.
+
+        ```rust
+        use pyo3::prelude::*;
+        ```
+        """
+    )
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md(
+        r"""
+        ### Defining functions
+
+        You can create a Python function from a Rust function adding the `#[pyfunction]` attribute:
+
+        ```rust
+        #[pyfunction]
+        fn sum_as_string(a: usize, b: usize) -> String {
+            (a + b).to_string()
+        }
+        ```
+        """
+    )
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md(
+        r"""
+        This function was trivial, but in case you need to handle errors, you should return `PyResult`, defined as `pub type PyResult<T> = Result<T, PyErr>`:
+
+        ```rust
+        #[pyfunction]
+        fn sum_as_string(a: usize, b: usize) -> PyResult<String> {
+            Ok((a + b).to_string())
+        }
+        ```
+        """
+    ).callout(kind="info")
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md(
+        r"""
+        ### Adding functions to modules
+
+        To be able to actually call the function from Python it needs to be added to a module. Modules are defined with the `#[pymodule]` attribute:
+
+        ```rust
+        #[pymodule]
+        #[pyo3(name = "_rode")]
+        fn rode(m: &Bound<'_, PyModule>) -> PyResult<()> {
+            m.add_function(wrap_pyfunction!(sum_as_string, m)?)?;
+            Ok(())
+        }
         ```
         """
     )
