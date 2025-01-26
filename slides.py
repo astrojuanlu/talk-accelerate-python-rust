@@ -14,9 +14,10 @@ def _():
 def _(mo):
     mo.md(
         """
-        # Accelerate Python with Rust
+        # Accelerate your Python code with Rust
 
         Juan Luis Cano Rodríguez <hello@juanlu.space>
+        2025-01-29 @ DoEPy
         """
     )
     return
@@ -72,7 +73,7 @@ def _(mo):
         ```toml
         [dependencies]
         # pyo3 = "0.23.3"
-        pyo3 = { version = "0.23.3", features = ["abi3-py39"] }
+        pyo3 = { version = "0.23.3", features = ["abi3-py38"] }
         ```
 
         Before:
