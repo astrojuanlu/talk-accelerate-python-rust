@@ -70,3 +70,6 @@ $ cat .vscode/settings.json
     ]
 }
 ```
+
+More:
+- What about `maturin generate-ci github`?
