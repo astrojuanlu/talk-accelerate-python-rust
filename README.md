@@ -7,7 +7,7 @@ Talk "Accelerate Python with Rust".
 Flat structure:
 
 ```shell
-$ uvx maturin new -b py3o --src guessing-game
+$ uvx maturin new -b pyo3 --src guessing-game
 $ cd guessing-game
 $ # Adjust Python version
 $ sd 'requires-python = ">=3.8"' 'requires-python = ">=3.9"' pyproject.toml
