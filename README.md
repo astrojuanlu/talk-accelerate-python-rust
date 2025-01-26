@@ -33,7 +33,7 @@ cache-keys = [{file = "pyproject.toml"}, {file = "rust/Cargo.toml"}, {file = "**
 
 (From https://github.com/PyO3/maturin/issues/2314#issuecomment-2488542771)
 
-Alternative, with workspaces:
+Alternative, with workspaces (inspired by https://github.com/astral-sh/uv/issues/9015#issue-2649309300):
 
 ```shell
 $ uv init
