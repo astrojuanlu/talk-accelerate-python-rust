@@ -2,6 +2,8 @@
 
 Talk "Accelerate Python with Rust".
 
+Example code: https://github.com/astrojuanlu/rode
+
 ## Notes
 
 Flat structure:
