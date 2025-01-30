@@ -4,6 +4,12 @@ Talk "Accelerate Python with Rust".
 
 Example code: https://github.com/astrojuanlu/rode
 
+To see the slides:
+
+```
+uvx marimo run slides.py
+```
+
 ## Notes
 
 Flat structure:

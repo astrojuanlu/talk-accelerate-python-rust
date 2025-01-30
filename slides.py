@@ -17,6 +17,7 @@ def _(mo):
         # Accelerate your Python code with Rust
 
         Juan Luis Cano Rodríguez <hello@juanlu.space>
+
         2025-01-29 @ DoEPy
         """
     )
@@ -63,12 +64,104 @@ def _(mo):
 @app.cell
 def _(mo):
     mo.md(
+        """
+        # Python is slow, you say?
+
+        ## Yes...
+
+        Pereira, R. _et al._ (2021) ‘Ranking programming languages by Energy Efficiency’, _Science of Computer Programming_, 205, p. 102609. doi:10.1016/j.scico.2021.102609.
+
+        ![Language efficiency](public/energy-time-memory-programming-languages.png)
+        """
+    )
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md(
+        """
+        ## ...but
+
+        ...the community has known _reasonable_ ways to get around that for 25+ years
+
+        ![SciPy languages](public/scipy-languages.png)
+        """
+    )
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md(
+        r"""
+        And yet, _reasonable_ doesn't mean "easy" nor "exciting"
+
+        ![@astrojuanlu rewriting odeint in Fortran 95 in 2013](public/astrojuanlu-odeint.png)
+        """
+    )
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md(
+        """
+        ## How to make Python faster then?
+
+        - NumPy
+        - Cython
+        - Pythran
+        - Numba
+        - PyPy
+        - mypyc
+        - ..._just write an extension in a compiled language_
+
+        Each option has pros and cons, there's no silver bullet.
+        """
+    )
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md(
+        r"""
+        ## Developer Experience wins
+
+        What if the bad part of compiled languages wasn't the languages themselves, but the **tooling**?
+
+        What if there was a compiled language that was **modern**, produced binaries that **don't need a runtime**, integrated **seamlessly** with Python, and had **awesome tooling**?
+        """
+    )
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md(
         r"""
         # Python + Rust = 🤜🤛
 
         The most desired 🐍 and the most admired 🦀! https://survey.stackoverflow.co/2024/technology/#2-programming-scripting-and-markup-languages
 
         ![Admired and desired](public/stack-overflow-survey-most-desired.png)
+        """
+    )
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md(
+        """
+        ## Why Rust?
+
+        - Because there are so many awesome crates (I care about ecosystems, not languages)
+        - Because many great Python libraries and tools have a Rust core (Polars, Pydantic, uv, ruff)
+        - Because the error messages and the IDE integration helps you learn
+        - Because it's memory safe
+        - Just for fun because it's cool
         """
     )
     return
@@ -291,6 +384,42 @@ def _(mo):
             Ok(())
         }
         ```
+        """
+    )
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md(
+        """
+        # It's demo time!
+
+        ::octicon:mark-github-16:: https://github.com/astrojuanlu/rode
+
+        ![Near-parabolic orbit propagation](public/farnocchia.png)
+        """
+    )
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md(
+        """
+        # Conclusions
+
+        - Integrating Python with Rust is straightforward
+        - For simple scientific code Rust is not that difficult to pick up
+        - Rewriting slow code fragments in Rust is a very effective strategy to accelerate Python code
+
+        **Thank you!**
+
+        ::octicon:mark-github-16:: https://github.com/astrojuanlu/talk-accelerate-python-rust
+
+        Juan Luis Cano Rodríguez <hello@juanlu.space>
+
+        2025-01-29 @ DoEPy
         """
     )
     return
