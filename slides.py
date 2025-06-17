@@ -18,7 +18,7 @@ def _(mo):
 
         Juan Luis Cano Rodríguez <hello@juanlu.space>
 
-        2025-01-29 @ DoEPy
+        2025-06-21 @ OpenSouthCode
         """
     )
     return
@@ -419,7 +419,7 @@ def _(mo):
 
         Juan Luis Cano Rodríguez <hello@juanlu.space>
 
-        2025-01-29 @ DoEPy
+        2025-06-21 @ OpenSouthCode
         """
     )
     return
