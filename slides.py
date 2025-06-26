@@ -18,7 +18,7 @@ def _(mo):
 
         Juan Luis Cano Rodríguez <hello@juanlu.space>
 
-        2025-06-21 @ OpenSouthCode
+        2025-06-26 @ PyData Madrid
         """
     )
     return
@@ -94,8 +94,28 @@ def _(mo):
 @app.cell
 def _(mo):
     mo.md(
-        r"""
-        And yet, _reasonable_ doesn't mean "easy" nor "exciting"
+        """
+        ## There are many ways to make Python faster
+
+        - NumPy
+        - Cython
+        - Pythran
+        - Numba
+        - PyPy
+        - mypyc
+        - ...write an extension in a compiled language: C, C++, FORTRAN
+
+        Each option has pros and cons, there's no silver bullet.
+        """
+    )
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md(
+        """
+        My first experience contributing a compiled extension to SciPy didn't go really well...
 
         ![@astrojuanlu rewriting odeint in Fortran 95 in 2013](public/astrojuanlu-odeint.png)
         """
@@ -106,18 +126,10 @@ def _(mo):
 @app.cell
 def _(mo):
     mo.md(
-        """
-        ## How to make Python faster then?
+        r"""
+        And that's why I was so excited about the alternatives!
 
-        - NumPy
-        - Cython
-        - Pythran
-        - Numba
-        - PyPy
-        - mypyc
-        - ..._just write an extension in a compiled language_
-
-        Each option has pros and cons, there's no silver bullet.
+        ![Old screenshot of Pybonacci first blog post on numba](public/pybonacci-numba-2012.png)
         """
     )
     return
@@ -132,6 +144,18 @@ def _(mo):
         What if the bad part of compiled languages wasn't the languages themselves, but the **tooling**?
 
         What if there was a compiled language that was **modern**, produced binaries that **don't need a runtime**, integrated **seamlessly** with Python, and had **awesome tooling**?
+        """
+    )
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md(
+        """
+        I became obsessed with numba, gave a dozen talks about it or more, and then focused on other things for a few years.
+
+        _Until..._
         """
     )
     return
@@ -191,6 +215,81 @@ def _(mo):
 def _(mo):
     mo.md(
         r"""
+        ## How does this all work?
+
+        This makes use of [PyO3](https://pyo3.rs/), a project that provides "Rust bindings to the Python interpreter".
+
+        > PyO3 can be used to write native Python modules or run Python code and modules from Rust.
+
+        ```rust
+        use pyo3::prelude::*;
+        ```
+        """
+    )
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md(
+        r"""
+        ### Defining functions
+
+        You can create a Python function from a Rust function adding the `#[pyfunction]` attribute:
+
+        ```rust
+        #[pyfunction]
+        fn sum_as_string(a: usize, b: usize) -> String {
+            (a + b).to_string()
+        }
+        ```
+        """
+    )
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md(
+        r"""
+        This function was trivial, but in case you need to handle errors, you should return `PyResult`, defined as `pub type PyResult<T> = Result<T, PyErr>`:
+
+        ```rust
+        #[pyfunction]
+        fn sum_as_string(a: usize, b: usize) -> PyResult<String> {
+            Ok((a + b).to_string())
+        }
+        ```
+        """
+    ).callout(kind="info")
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md(
+        r"""
+        ### Adding functions to modules
+
+        To be able to actually call the function from Python it needs to be added to a module. Modules are defined with the `#[pymodule]` attribute:
+
+        ```rust
+        #[pymodule]
+        #[pyo3(name = "_rode")]
+        fn rode(m: &Bound<'_, PyModule>) -> PyResult<()> {
+            m.add_function(wrap_pyfunction!(sum_as_string, m)?)?;
+            Ok(())
+        }
+        ```
+        """
+    )
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md(
+        r"""
         ## Now, a few adjustments
 
         ### Broaden compatibility of built wheels
@@ -200,8 +299,8 @@ def _(mo):
         ```toml
         # Cargo.toml
         [dependencies]
-        # pyo3 = "0.23.3"
-        pyo3 = { version = "0.23.3", features = ["abi3-py38"] }
+        # pyo3 = "0.25.1"
+        pyo3 = { version = "0.25.1", features = ["abi3-py39"] }
         ```
 
         Before:
@@ -217,7 +316,7 @@ def _(mo):
         ```
         $ uv run maturin build
         ...
-        📦 Built wheel for abi3 Python ≥ 3.8 to .../guessing-game/target/wheels/guessing_game-0.1.0-cp38-abi3-manylinux_2_34_x86_64.whl
+        📦 Built wheel for abi3 Python ≥ 3.9 to .../guessing-game/target/wheels/guessing_game-0.1.0-cp39-abi3-manylinux_2_34_x86_64.whl
         ```
         """
     )
@@ -317,81 +416,6 @@ def _(mo):
 @app.cell
 def _(mo):
     mo.md(
-        r"""
-        ## How does this all work?
-
-        This makes use of [PyO3](https://pyo3.rs/), a project that provides "Rust bindings to the Python interpreter".
-
-        > PyO3 can be used to write native Python modules or run Python code and modules from Rust.
-
-        ```rust
-        use pyo3::prelude::*;
-        ```
-        """
-    )
-    return
-
-
-@app.cell
-def _(mo):
-    mo.md(
-        r"""
-        ### Defining functions
-
-        You can create a Python function from a Rust function adding the `#[pyfunction]` attribute:
-
-        ```rust
-        #[pyfunction]
-        fn sum_as_string(a: usize, b: usize) -> String {
-            (a + b).to_string()
-        }
-        ```
-        """
-    )
-    return
-
-
-@app.cell
-def _(mo):
-    mo.md(
-        r"""
-        This function was trivial, but in case you need to handle errors, you should return `PyResult`, defined as `pub type PyResult<T> = Result<T, PyErr>`:
-
-        ```rust
-        #[pyfunction]
-        fn sum_as_string(a: usize, b: usize) -> PyResult<String> {
-            Ok((a + b).to_string())
-        }
-        ```
-        """
-    ).callout(kind="info")
-    return
-
-
-@app.cell
-def _(mo):
-    mo.md(
-        r"""
-        ### Adding functions to modules
-
-        To be able to actually call the function from Python it needs to be added to a module. Modules are defined with the `#[pymodule]` attribute:
-
-        ```rust
-        #[pymodule]
-        #[pyo3(name = "_rode")]
-        fn rode(m: &Bound<'_, PyModule>) -> PyResult<()> {
-            m.add_function(wrap_pyfunction!(sum_as_string, m)?)?;
-            Ok(())
-        }
-        ```
-        """
-    )
-    return
-
-
-@app.cell
-def _(mo):
-    mo.md(
         """
         # It's demo time!
 
@@ -419,7 +443,7 @@ def _(mo):
 
         Juan Luis Cano Rodríguez <hello@juanlu.space>
 
-        2025-06-21 @ OpenSouthCode
+        2025-06-26 @ PyData Madrid
         """
     )
     return
