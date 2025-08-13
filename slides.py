@@ -18,7 +18,7 @@ def _(mo):
 
     Juan Luis Cano Rodríguez <hello@juanlu.space>
 
-    2025-06-26 @ PyData Madrid
+    2025-08-20 @ EuroSciPy Kraków
     """
     )
     return
@@ -48,7 +48,7 @@ def _(mo):
     Juan Luis (he/him/él 🇪🇸)
 
     - Aerospace Engineer passionate about tech communities and sustainability ♻️
-    - Product Manager at QuantumBlack, AI by McKinsey, for Kedro, an open source pipeline framework 🥑
+    - In between jobs (ex Product Manager for Kedro at McKinsey, ex Developer Advocate at Read the Docs) 🥑
     - Organizer of the PyData Madrid monthly meetup (ex Python España, ex PyCon Spain) 🐍
     - Contributor to the SciPy and PyData ecosystem 🧪
     - Music lover 🎵
@@ -95,7 +95,7 @@ def _(mo):
 def _(mo):
     mo.md(
         """
-    ## There are many ways to make Python faster
+    ## There are ~~too~~ many ways to make Python faster
 
     - NumPy
     - Cython
@@ -129,7 +129,19 @@ def _(mo):
         r"""
     And that's why I was so excited about the alternatives!
 
-    ![Old screenshot of Pybonacci first blog post on numba](public/pybonacci-numba-2012.png)
+    ![Screenshot of a PyVideo talk on Numba](public/juanlu-numba-pyvideo.png)
+    """
+    )
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md(
+        """
+    I used numba a lot, gave a dozen talks about it, and then focused on other things for a few years.
+
+    🧘‍♂️
     """
     )
     return
@@ -139,7 +151,7 @@ def _(mo):
 def _(mo):
     mo.md(
         r"""
-    ## Developer Experience wins
+    **Fast forward to 2025...**
 
     What if the bad part of compiled languages wasn't the languages themselves, but the **tooling**?
 
@@ -152,10 +164,12 @@ def _(mo):
 @app.cell
 def _(mo):
     mo.md(
-        """
-    I became obsessed with numba, gave a dozen talks about it or more, and then focused on other things for a few years.
+        r"""
+    # Python + Rust = 🤜🤛
 
-    _Until..._
+    The most desired 🐍 and the most admired 🦀! https://survey.stackoverflow.co/2025/technology#2-programming-scripting-and-markup-languages
+
+    ![Admired and desired](public/stack-overflow-survey-most-desired.png)
     """
     )
     return
@@ -165,11 +179,18 @@ def _(mo):
 def _(mo):
     mo.md(
         r"""
-    # Python + Rust = 🤜🤛
+    ## What is Rust?
 
-    The most desired 🐍 and the most admired 🦀! https://survey.stackoverflow.co/2024/technology/#2-programming-scripting-and-markup-languages
+    > The Chromium project finds that around 70% of our serious security bugs are memory safety problems.
 
-    ![Admired and desired](public/stack-overflow-survey-most-desired.png)
+    https://www.chromium.org/Home/chromium-security/memory-safety/
+
+    - Created at Mozilla Research in 2006, version 1.0 in 2015
+    - Emphasis on memory safety, type safety
+    - Popular in data engineering (Polars, Delta Lake) and Python tooling (uv, ruff)
+    - First language other than C and assembly to be included in the Linux kernel
+    - MIT + Apache 2.0 licensed
+    - Supported by the Rust Foundation, a US 501(c)6 non-profit
     """
     )
     return
@@ -217,11 +238,23 @@ def _(mo):
         r"""
     ## How does this all work?
 
+    ```
+    $ tree
+    .
+    ├── Cargo.toml
+    ├── pyproject.toml
+    └── src
+        └── lib.rs
+
+    2 directories, 3 files
+    ```
+
     This makes use of [PyO3](https://pyo3.rs/), a project that provides "Rust bindings to the Python interpreter".
 
     > PyO3 can be used to write native Python modules or run Python code and modules from Rust.
 
-    ```rust
+    ```
+    $ head -n1 src/lib.rs
     use pyo3::prelude::*;
     ```
     """
@@ -235,14 +268,19 @@ def _(mo):
         r"""
     ### Defining functions
 
-    You can create a Python function from a Rust function adding the `#[pyfunction]` attribute:
-
     ```rust
+    /// Formats the sum of two numbers as string.
     #[pyfunction]
     fn sum_as_string(a: usize, b: usize) -> String {
         (a + b).to_string()
     }
     ```
+
+    - `///` Marks the beginning of a _doc comment_
+    - `#[pyfunction]` is an _attribute macro_ coming from PyO3
+    - `fn sum_as_string` defines the function
+    - Both parameters and the function itself have annotated types
+    - `(a + b).to_string()` is the last expression of the function block and becomes its return value
     """
     )
     return
@@ -252,7 +290,7 @@ def _(mo):
 def _(mo):
     mo.md(
         r"""
-        This function was trivial, but in case you need to handle errors, you should return `PyResult`, defined as `pub type PyResult<T> = Result<T, PyErr>`:
+        In PyO3, errors are handled using the `PyResult` type, which wraps the actual return type (it is defined as `pub type PyResult<T> = Result<T, PyErr>`):
 
         ```rust
         #[pyfunction]
@@ -274,9 +312,9 @@ def _(mo):
     To be able to actually call the function from Python it needs to be added to a module. Modules are defined with the `#[pymodule]` attribute:
 
     ```rust
+    /// A Python module implemented in Rust.
     #[pymodule]
-    #[pyo3(name = "_rode")]
-    fn rode(m: &Bound<'_, PyModule>) -> PyResult<()> {
+    fn guessing_game(m: &Bound<'_, PyModule>) -> PyResult<()> {
         m.add_function(wrap_pyfunction!(sum_as_string, m)?)?;
         Ok(())
     }
@@ -299,22 +337,24 @@ def _(mo):
     ```toml
     # Cargo.toml
     [dependencies]
-    # pyo3 = "0.25.1"
+    # pyo3 = "0.25.0"
     pyo3 = { version = "0.25.1", features = ["abi3-py39"] }
     ```
 
     Before:
 
     ```
-    $ uv run maturin build
+    $ uvx maturin build
+    🔗 Found pyo3 bindings
     ...
-    📦 Built wheel for CPython 3.11 to .../guessing-game/target/wheels/guessing_game-0.1.0-cp311-cp311-manylinux_2_34_x86_64.whl
+    📦 Built wheel for CPython 3.13 to .../guessing-game/target/wheels/guessing_game-0.1.0-cp313-cp313-manylinux_2_34_x86_64.whl
     ```
 
     After ✨:
 
     ```
-    $ uv run maturin build
+    $ uvx maturin build
+    🔗 Found pyo3 bindings with abi3 support
     ...
     📦 Built wheel for abi3 Python ≥ 3.9 to .../guessing-game/target/wheels/guessing_game-0.1.0-cp39-abi3-manylinux_2_34_x86_64.whl
     ```
@@ -380,7 +420,7 @@ def _(mo):
 
     ```python
     # src/guessing_game/__init__.py
-    # See https://www.maturin.rs/project_layout#pure-rust-project
+    # See https://www.maturin.rs/project_layout
     from ._guessing_game import *
 
     __doc__ = _guessing_game.__doc__
@@ -443,7 +483,7 @@ def _(mo):
 
     Juan Luis Cano Rodríguez <hello@juanlu.space>
 
-    2025-06-26 @ PyData Madrid
+    2025-08-20 @ EuroSciPy Kraków
     """
     )
     return
