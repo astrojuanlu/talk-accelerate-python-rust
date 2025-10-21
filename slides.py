@@ -56,7 +56,7 @@ def _(mo):
 
     Follow me! ::octicon:mark-github-16:: [github.com/astrojuanlu](https://github.com/astrojuanlu)
 
-    ![Mini Juanlu](public/minijuanlu.png)
+    ![Mini Juanlu](public/juanlu-plaza-españa.jpg)
     """
     )
     return
