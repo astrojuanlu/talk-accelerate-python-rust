@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.14.17"
+__generated_with = "0.17.0"
 app = marimo.App(width="medium", layout_file="layouts/slides.slides.json")
 
 
@@ -18,7 +18,7 @@ def _(mo):
 
     Juan Luis Cano Rodríguez <hello@juanlu.space>
 
-    2025-08-20 @ EuroSciPy Kraków
+    2025-10-21 @ PyData Toledo
     """
     )
     return
@@ -48,7 +48,8 @@ def _(mo):
     Juan Luis (he/him/él 🇪🇸)
 
     - Aerospace Engineer passionate about tech communities and sustainability ♻️
-    - In between jobs (ex Product Manager for Kedro at McKinsey, ex Developer Advocate at Read the Docs) 🥑
+    - Developer Relations Engineer at Canonical, the makers of Ubuntu 🥑
+      - Past: McKinsey & Company, Read the Docs, Satellogic
     - Organizer of the PyData Madrid monthly meetup (ex Python España, ex PyCon Spain) 🐍
     - Contributor to the SciPy and PyData ecosystem 🧪
     - Music lover 🎵
@@ -138,18 +139,6 @@ def _(mo):
 @app.cell
 def _(mo):
     mo.md(
-        """
-    I used numba a lot, gave a dozen talks about it, and then focused on other things for a few years.
-
-    🧘‍♂️
-    """
-    )
-    return
-
-
-@app.cell
-def _(mo):
-    mo.md(
         r"""
     **Fast forward to 2025...**
 
@@ -205,8 +194,14 @@ def _(mo):
     - Because there are so many awesome crates (I care about ecosystems, not languages)
     - Because many great Python libraries and tools have a Rust core (Polars, Pydantic, uv, ruff)
     - Because the error messages and the IDE integration helps you learn
-    - Because it's memory safe
     - Just for fun because it's cool
+
+    ```rust
+    // main.rs
+    fn main() {
+        println!("Hello, world!");
+    }
+    ```
     """
     )
     return
@@ -218,12 +213,12 @@ def _(mo):
         """
     ## Get started in 3 simple steps
 
-    1. `uvx maturin new -b pyo3 --src guessing-game && cd guessing-game`
+    1. `uvx maturin new -b pyo3 --src py-rust && cd py-rust`
     2. `uv run python` (this will take care of everything!)
     3. Run this in the REPL:
 
     ```python
-    >>> from guessing_game import sum_as_string
+    >>> from py_rust import sum_as_string
     >>> sum_as_string(2, 3)
     '5'
     ```
@@ -313,11 +308,16 @@ def _(mo):
 
     ```rust
     /// A Python module implemented in Rust.
-    #[pymodule]
-    fn guessing_game(m: &Bound<'_, PyModule>) -> PyResult<()> {
-        m.add_function(wrap_pyfunction!(sum_as_string, m)?)?;
-        Ok(())
+    #[pyo3::pymodule]
+    mod py_rust {
+        use pyo3::prelude::*;
+
+        #[pyfunction]
+        fn sum_as_string(a: usize, b: usize) -> PyResult<String> {
+            Ok((a + b).to_string())
+        }
     }
+
     ```
     """
     )
@@ -338,7 +338,7 @@ def _(mo):
     # Cargo.toml
     [dependencies]
     # pyo3 = "0.25.0"
-    pyo3 = { version = "0.25.1", features = ["abi3-py39"] }
+    pyo3 = { version = "0.27.0", features = ["abi3-py310"] }
     ```
 
     Before:
@@ -347,7 +347,7 @@ def _(mo):
     $ uvx maturin build
     🔗 Found pyo3 bindings
     ...
-    📦 Built wheel for CPython 3.13 to .../guessing-game/target/wheels/guessing_game-0.1.0-cp313-cp313-manylinux_2_34_x86_64.whl
+    📦 Built wheel for CPython 3.14 to .../py_rust-0.1.0/target/wheels/py_rust-0.1.0-cp314-cp314-linux_x86_64.whl
     ```
 
     After ✨:
@@ -356,7 +356,7 @@ def _(mo):
     $ uvx maturin build
     🔗 Found pyo3 bindings with abi3 support
     ...
-    📦 Built wheel for abi3 Python ≥ 3.9 to .../guessing-game/target/wheels/guessing_game-0.1.0-cp39-abi3-manylinux_2_34_x86_64.whl
+    📦 Built wheel for abi3 Python ≥ 3.10 to .../py_rust-0.1.0/target/wheels/py_rust-0.1.0-cp310-abi3-linux_x86_64.whl
     ```
     """
     )
@@ -375,7 +375,7 @@ def _(mo):
     ├── README.md
     ├── pyproject.toml
     ├── src
-    │   └── guessing_game
+    │   └── py_rust
     │       └── __init__.py
     └── rust
         ├── Cargo.toml
@@ -399,13 +399,13 @@ def _(mo):
     ```toml
     [tool.maturin]
     features = ["pyo3/extension-module"]
-    module-name = "guessing_game._guessing_game"  # <---
+    module-name = "py_rust._py_rust"  # <---
     ```
 
     ```rust
-    #[pymodule]
-    #[pyo3(name = "_guessing_game")]  // <---
-    fn guessing_game(m: &Bound<'_, PyModule>) -> PyResult<()> {
+    #[pyo3::pymodule]
+    #[pyo3(name = "_py_rust")]  // <---
+    mod py_rust {
     ```
     """
     )
@@ -419,13 +419,13 @@ def _(mo):
     ...and write your own Python code:
 
     ```python
-    # src/guessing_game/__init__.py
+    # src/py_rust/__init__.py
     # See https://www.maturin.rs/project_layout
-    from ._guessing_game import *
+    from ._py_rust import *
 
-    __doc__ = _guessing_game.__doc__
-    if hasattr(_guessing_game, "__all__"):
-        __all__ = _guessing_game.__all__
+    __doc__ = _py_rust.__doc__
+    if hasattr(_py_rust, "__all__"):
+        __all__ = _py_rust.__all__
     ```
     """
     )
@@ -483,7 +483,7 @@ def _(mo):
 
     Juan Luis Cano Rodríguez <hello@juanlu.space>
 
-    2025-08-20 @ EuroSciPy Kraków
+    2025-10-21 @ PyData Toledo
     """
     )
     return
